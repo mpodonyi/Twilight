@@ -285,49 +285,49 @@ namespace Twilight.Internal
                 {
                     return dt.Date + TimeSpanFromMinutes(timeLocal,2);
                 }
-                else
+
+
+                var jday = jd;
+                var increment = ((timeLocal < 0) ? 1 : -1);
+                while ((timeLocal < 0.0) || (timeLocal >= 1440.0))
                 {
-                    var jday = jd;
-                    var increment = ((timeLocal < 0) ? 1 : -1);
-                    while ((timeLocal < 0.0) || (timeLocal >= 1440.0))
-                    {
-                        timeLocal += increment * 1440.0;
+                    timeLocal += increment * 1440.0;
 
-                        jday -= increment;
-                    }
-
-                    return DateFromJulianDay(jday) + TimeSpanFromMinutes(timeLocal, 2);
+                    jday -= increment;
                 }
+
+                return DateFromJulianDay(jday) + TimeSpanFromMinutes(timeLocal, 2);
+            }
+
+           
+
+            // no sunrise/set found
+            var doy = CalcDayOfYearFromJulianDay(jd);
+            double jdy;
+            if (((latitude > 66.4) && (doy > 79) && (doy < 267)) || ((latitude < -66.4) && ((doy < 83) || (doy > 263))))
+            {   //previous sunrise/next sunset
+                if (rise)
+                { // find previous sunrise
+                    jdy = CalcJulianDayOfNextPrevRiseSet(false, true, jd, latitude, longitude, timezone, dst, sunRiseTypes);
+                }
+                else
+                { // find next sunset
+                    jdy = CalcJulianDayOfNextPrevRiseSet(true, false, jd, latitude, longitude, timezone, dst, sunRiseTypes);
+                }
+
+                return DateFromJulianDay(jdy);//, false, 3);
             }
             else
-            { // no sunrise/set found
-                var doy = CalcDayOfYearFromJulianDay(jd);
-                double jdy;
-                if (((latitude > 66.4) && (doy > 79) && (doy < 267)) || ((latitude < -66.4) && ((doy < 83) || (doy > 263))))
-                {   //previous sunrise/next sunset
-                    if (rise)
-                    { // find previous sunrise
-                        jdy = CalcJulianDayOfNextPrevRiseSet(false, true, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-                    }
-                    else
-                    { // find next sunset
-                        jdy = CalcJulianDayOfNextPrevRiseSet(true, false, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-                    }
-
-                    return DateFromJulianDay(jdy);//, false, 3);
+            {   //previous sunset/next sunrise
+                if (rise)
+                { // find previous sunrise
+                    jdy = CalcJulianDayOfNextPrevRiseSet(true, true, jd, latitude, longitude, timezone, dst, sunRiseTypes);
                 }
                 else
-                {   //previous sunset/next sunrise
-                    if (rise)
-                    { // find previous sunrise
-                        jdy = CalcJulianDayOfNextPrevRiseSet(true, true, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-                    }
-                    else
-                    { // find next sunset
-                        jdy = CalcJulianDayOfNextPrevRiseSet(false, false, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-                    }
-                    return DateFromJulianDay(jdy);//, false, 3);
+                { // find next sunset
+                    jdy = CalcJulianDayOfNextPrevRiseSet(false, false, jd, latitude, longitude, timezone, dst, sunRiseTypes);
                 }
+                return DateFromJulianDay(jdy);//, false, 3);
             }
         }
 

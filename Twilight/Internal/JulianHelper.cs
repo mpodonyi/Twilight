@@ -15,39 +15,55 @@ namespace Twilight.Internal
 
         internal static double toJulian(DateTime date) { return DateTimeToUnixTimestamp(date) / dayMs - 0.5 + J1970; }
         //internal static DateTime fromJulian(double j) { return UnixTimestampToDateTime((j + 0.5 - J1970) * dayMs); }
-        internal static double toDays(DateTime date) {
-            var t1 = GetJulianDay(date);
-            var t2 = toJulian(date); //mor accurate
-
-
-
-            return toJulian(date) - J2000;
-
-
-
-        } //MP: merge with GetJulianDay
-
+        internal static double toDays(DateTime date) { return toJulian(date) - J2000; } 
       
 
-        internal static double GetJulianDay(DateTime date) //Julian Date
+    }
+
+
+    public class JulianDate
+    {
+        private static bool isJulianDate(int year, int month, int day)
         {
-            double docmonth = date.Month;
-            double docday = date.Day;
-            double docyear = date.Year;
-
-            if (docmonth <= 2)
+            // All dates prior to 1582 are in the Julian calendar
+            if (year < 1582)
+                return true;
+            // All dates after 1582 are in the Gregorian calendar
+            else if (year > 1582)
+                return false;
+            else
             {
-                docyear -= 1;
-                docmonth += 12;
+                // If 1582, check before October 4 (Julian) or after October 15 (Gregorian)
+                if (month < 10)
+                    return true;
+                else if (month > 10)
+                    return false;
+                else
+                {
+                    if (day < 5)
+                        return true;
+                    else if (day > 14)
+                        return false;
+                    else
+                        // Any date in the range 10/5/1582 to 10/14/1582 is invalid 
+                        throw new ArgumentOutOfRangeException(
+                            "This date is not valid as it does not exist in either the Julian or the Gregorian calendars.");
+                }
             }
-
-            var a = Math.Floor(docyear / 100);
-            var b = 2 - a + Math.Floor(a / 4);
-
-            return Math.Floor(365.25 * (docyear + 4716)) + Math.Floor(30.6001 * (docmonth + 1)) + docday + b - 1524.5;
         }
 
-      
+        internal static double DateToJD(int year, int month, int day, int hour, int minute, int second, int millisecond)
+        {
+            // Determine correct calendar based on date
+            bool JulianCalendar = isJulianDate(year, month, day);
+
+            int M = month > 2 ? month : month + 12;
+            int Y = month > 2 ? year : year - 1;
+            double D = day + hour / 24.0 + minute / 1440.0 + (second + millisecond * 1000) / 86400.0;
+            int B = JulianCalendar ? 0 : 2 - Y / 100 + Y / 100 / 4;
+
+            return (int)(365.25 * (Y + 4716)) + (int)(30.6001 * (M + 1)) + D + B - 1524.5;
+        }
 
     }
 }
