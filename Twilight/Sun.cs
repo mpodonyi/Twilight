@@ -10,7 +10,7 @@ namespace Twilight
 
     public class SunPeriod
     {
-        internal SunPeriod(DateTime? rise, DateTime? set, bool isAlwaysUp, bool isAlwaysDown)
+        internal SunPeriod(DateTimeOffset? rise, DateTimeOffset? set, bool isAlwaysUp, bool isAlwaysDown)
         {
             Rise = rise;
             Set = set;
@@ -18,8 +18,8 @@ namespace Twilight
             IsAlwaysDown = isAlwaysDown;
         }
 
-        public DateTime? Rise { get; }
-        public DateTime? Set { get; }
+        public DateTimeOffset? Rise { get; }
+        public DateTimeOffset? Set { get; }
 
         public bool IsAlwaysUp { get; }
 
@@ -29,65 +29,47 @@ namespace Twilight
 
     public static class Sun
     {
-        private static bool Between(DateTime datefrom, DateTime now, DateTime dateto)
-        {
-            if ((datefrom.Date < now.Date) && (now.Date < dateto.Date))
-                return true;
-
-            return false;
-
-        }
+        private static bool Between(DateTimeOffset datefrom, DateTimeOffset now, DateTimeOffset dateto) => (datefrom.Date < now.Date) && (now.Date < dateto.Date);
 
 
         //MP: Ensure date is local time
         //MP: check year between -2000, 3000
         //MP: use TimeZoneInfo to calculate the day
 
-        public static SunPeriod SunPeriod(DateTime localDate, TimeZoneInfo timeZone, double lat, double lng)
+        public static SunPeriod SunPeriod(DateTimeOffset localDate, double lat, double lng)
         {
-            var jday = GetJulianDay(localDate);
+            var jday = GetJulianDay(localDate.Date);
 
-            double tz = timeZone.BaseUtcOffset.TotalMinutes / 60;
-            var dst = timeZone.IsDaylightSavingTime(localDate);
-
-            DateTime rise =  CalcSunriseSet(true, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Default);
-            DateTime set = CalcSunriseSet(false, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Default);
+            DateTime rise =  CalcSunriseSet(true, jday, lat, lng, localDate, SunRiseTypes.Default);
+            DateTime set = CalcSunriseSet(false, jday, lat, lng, localDate, SunRiseTypes.Default);
             return new SunPeriod(rise,set, Between(rise, localDate, set), Between(set, localDate, rise));
         }
 
-        public static SunPeriod CivilPeriod(DateTime localDate, TimeZoneInfo timeZone, double lat, double lng)
+        public static SunPeriod CivilPeriod(DateTimeOffset localDate,  double lat, double lng)
         {
-            var jday = GetJulianDay(localDate);
+            var jday = GetJulianDay(localDate.Date);
 
-            double tz = timeZone.BaseUtcOffset.TotalMinutes / 60;
-            var dst = timeZone.IsDaylightSavingTime(localDate);
-
-            DateTime rise = CalcSunriseSet(true, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Civil);
-            DateTime set = CalcSunriseSet(false, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Civil);
+            DateTime rise = CalcSunriseSet(true, jday, lat, lng, localDate, SunRiseTypes.Civil);
+            DateTime set = CalcSunriseSet(false, jday, lat, lng, localDate, SunRiseTypes.Civil);
             return new SunPeriod(rise, set, Between(rise, localDate, set), Between(set, localDate, rise));
         }
 
-        public static SunPeriod NauticalPeriod(DateTime localDate, TimeZoneInfo timeZone, double lat, double lng)
+        public static SunPeriod NauticalPeriod(DateTimeOffset localDate,  double lat, double lng)
         {
-            var jday = GetJulianDay(localDate);
+            var jday = GetJulianDay(localDate.Date);
 
-            double tz = timeZone.BaseUtcOffset.TotalMinutes / 60;
-            var dst = timeZone.IsDaylightSavingTime(localDate);
 
-            DateTime rise = CalcSunriseSet(true, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Nautical);
-            DateTime set = CalcSunriseSet(false, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Nautical);
+            DateTime rise = CalcSunriseSet(true, jday, lat, lng, localDate, SunRiseTypes.Nautical);
+            DateTime set = CalcSunriseSet(false, jday, lat, lng, localDate, SunRiseTypes.Nautical);
             return new SunPeriod(rise, set, Between(rise, localDate, set), Between(set, localDate, rise));
         }
 
-        public static SunPeriod AstronomicalPeriod(DateTime localDate, TimeZoneInfo timeZone, double lat, double lng)
+        public static SunPeriod AstronomicalPeriod(DateTimeOffset localDate, double lat, double lng)
         {
-            var jday = GetJulianDay(localDate);
+            var jday = GetJulianDay(localDate.Date);
 
-            double tz = timeZone.BaseUtcOffset.TotalMinutes / 60;
-            var dst = timeZone.IsDaylightSavingTime(localDate);
-
-            DateTime rise = CalcSunriseSet(true, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Astro);
-            DateTime set = CalcSunriseSet(false, jday, lat, lng, tz, dst, localDate, SunRiseTypes.Astro);
+            DateTime rise = CalcSunriseSet(true, jday, lat, lng, localDate, SunRiseTypes.Astro);
+            DateTime set = CalcSunriseSet(false, jday, lat, lng, localDate, SunRiseTypes.Astro);
             return new SunPeriod(rise, set, Between(rise, localDate, set), Between(set, localDate, rise));
         }
 
