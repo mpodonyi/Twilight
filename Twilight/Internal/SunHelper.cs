@@ -1,6 +1,6 @@
 using System;
 
-namespace Twilight
+namespace Twilight.Internal
 {
     static class SunHelper
     {

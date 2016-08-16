@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Globalization;
-using static Twilight.SunHelper;
+using static Twilight.Internal.SunHelper;
 
 namespace Twilight
 {
