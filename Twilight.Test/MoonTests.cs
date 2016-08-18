@@ -6,7 +6,7 @@ using static System.Math;
 
 namespace Twilight.Test
 {
-    public class Tests
+    public class MoonTests
     {
 
       

@@ -193,7 +193,7 @@ namespace Twilight.Internal
             return 720 - (4.0 * delta) - eqTime; // in minutes
         }
 
-        internal static DateTime DateFromJulianDay(double jd)//false, 2
+        internal static DateTimeOffset DateFromJulianDay(double jd)//false, 2
         {
             // returns a string in the form DDMMMYYYY[ next] to display prev/next rise/set
             // flag=2 for DD MMM, 3 for DD MM YYYY, 4 for DDMMYYYY next/prev
@@ -222,7 +222,7 @@ namespace Twilight.Internal
             var month = (e < 14) ? e - 1 : e - 13;
             var year = ((month > 2) ? c - 4716 : c - 4715);
 
-            return new DateTime((int)year, (int)month, (int)day);
+            return new DateTimeOffset((int)year, (int)month, (int)day,0,0,0,TimeSpan.Zero);
         }
 
         // timeString returns a zero-padded string (HH:MM:SS) given time in minutes
@@ -245,7 +245,24 @@ namespace Twilight.Internal
             return retval;
         }
 
-        internal static double CalcJulianDayOfNextPrevRiseSet(bool next, bool rise, double jd, double latitude, double longitude, double tz, bool dst, SunRiseTypes sunRiseTypes)
+        //MP: improve this
+        internal static DateTimeOffset RoundToMinute(DateTimeOffset offset)
+        {
+            //if ((!(minutes >= 0)) || (!(minutes < 1440))) throw new Exception("error");
+
+            const int minute = 1 *60 * 1000;
+            int off = offset.Second * 1000 + offset.Millisecond;
+
+            return offset.Second >= 30
+                ? offset.AddMilliseconds(minute - off)
+                : offset.AddMilliseconds(-off);
+        }
+
+
+
+
+
+        private static double CalcJulianDayOfNextPrevRiseSet(bool next, bool rise, double jd, double latitude, double longitude, TimeSpan offset, SunRiseTypes sunRiseTypes)
         {
             var julianday = jd;
             var increment = ((next) ? 1.0 : -1.0);
@@ -256,7 +273,7 @@ namespace Twilight.Internal
                 julianday += increment;
                 time = CalcSunriseSetUtc(rise, julianday, latitude, longitude, sunRiseTypes);
             }
-            var timeLocal = time + tz * 60.0 + ((dst) ? 60.0 : 0.0);
+            var timeLocal = time + offset.TotalMinutes;
             while ((timeLocal < 0.0) || (timeLocal >= 1440.0))
             {
                 var incr = ((timeLocal < 0) ? 1 : -1);
@@ -270,67 +287,59 @@ namespace Twilight.Internal
         //---------------------------
 
 
+        private static readonly TimeSpan DayStart = TimeSpan.FromMinutes(0);
+        private static readonly TimeSpan DayEnd = TimeSpan.FromMinutes(1440);
 
 
+        internal static DateTimeOffset DateBuilder(DateTimeOffset origDay, double time)
+        {
+            TimeSpan tsNewTime = TimeSpan.FromMinutes(time) + origDay.Offset;
 
-        internal static DateTime CalcSunriseSet(bool rise, double jd, double latitude, double longitude, DateTimeOffset dt, SunRiseTypes sunRiseTypes)
+            return RoundToMinute(new DateTimeOffset(origDay.Date, origDay.Offset) + tsNewTime);
+
+        }
+
+        internal static DateTimeOffset CalcSunriseSet(bool rise, double jd, double latitude, double longitude, DateTimeOffset dt, SunRiseTypes sunRiseTypes)
         {
             var timeUtc = CalcSunriseSetUtc(rise, jd, latitude, longitude, sunRiseTypes);
             var newTimeUtc = CalcSunriseSetUtc(rise, jd + timeUtc / 1440.0, latitude, longitude, sunRiseTypes);
-            if (!double.IsNaN(newTimeUtc)) 
+            if (!double.IsNaN(newTimeUtc))
             {
-                return DateFromJulianDay(jd) + TimeSpanFromMinutes(newTimeUtc, 2);
-
-                //var timeLocal = newTimeUtc + (timezone * 60.0);
-                //timeLocal += ((dst) ? 60.0 : 0.0);
-                //if ((timeLocal >= 0.0) && (timeLocal < 1440.0))
-                //{
-                //    return dt.Date + TimeSpanFromMinutes(timeLocal, 2);
-                //}
-
-
-                //var jday = jd;
-                //var increment = ((timeLocal < 0) ? 1 : -1);
-                //while ((timeLocal < 0.0) || (timeLocal >= 1440.0))
-                //{
-                //    timeLocal += increment * 1440.0;
-
-                //    jday -= increment;
-                //}
-
-                //return DateFromJulianDay(jday) + TimeSpanFromMinutes(timeLocal, 2);
+                return DateBuilder(dt, newTimeUtc);
             }
 
-           throw new NotImplementedException();
+            //no sunrise/ set found
+            var doy = CalcDayOfYearFromJulianDay(jd);
+            double jdy;
+            if (((latitude > 66.4) && (doy > 79) && (doy < 267)) || ((latitude < -66.4) && ((doy < 83) || (doy > 263))))
+            {   
+                //isAlwaysUp
+                //previous sunrise/next sunset
+                if (rise)
+                { // find previous sunrise
+                    jdy = CalcJulianDayOfNextPrevRiseSet(false, true, jd, latitude, longitude, dt.Offset, sunRiseTypes);
+                }
+                else
+                { // find next sunset
+                    jdy = CalcJulianDayOfNextPrevRiseSet(true, false, jd, latitude, longitude, dt.Offset, sunRiseTypes);
+                }
 
-            // no sunrise/set found
-            //var doy = CalcDayOfYearFromJulianDay(jd);
-            //double jdy;
-            //if (((latitude > 66.4) && (doy > 79) && (doy < 267)) || ((latitude < -66.4) && ((doy < 83) || (doy > 263))))
-            //{   //previous sunrise/next sunset
-            //    if (rise)
-            //    { // find previous sunrise
-            //        jdy = CalcJulianDayOfNextPrevRiseSet(false, true, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-            //    }
-            //    else
-            //    { // find next sunset
-            //        jdy = CalcJulianDayOfNextPrevRiseSet(true, false, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-            //    }
-
-            //    return DateFromJulianDay(jdy);//, false, 3);
-            //}
-            //else
-            //{   //previous sunset/next sunrise
-            //    if (rise)
-            //    { // find previous sunrise
-            //        jdy = CalcJulianDayOfNextPrevRiseSet(true, true, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-            //    }
-            //    else
-            //    { // find next sunset
-            //        jdy = CalcJulianDayOfNextPrevRiseSet(false, false, jd, latitude, longitude, timezone, dst, sunRiseTypes);
-            //    }
-            //    return DateFromJulianDay(jdy);//, false, 3);
-            //}
+                return DateFromJulianDay(jdy);//, false, 3);
+            }
+            else
+            {   
+                //isAlwaysDown
+                //previous sunset/next sunrise
+                if (rise)
+                { // find previous sunrise
+                    jdy = CalcJulianDayOfNextPrevRiseSet(true, true, jd, latitude, longitude, dt.Offset, sunRiseTypes);
+                }
+                else
+                { // find next sunset
+                    jdy = CalcJulianDayOfNextPrevRiseSet(false, false, jd, latitude, longitude, dt.Offset, sunRiseTypes);
+                }
+                return DateFromJulianDay(jdy);//, false, 3);
+            }
         }
 
 
