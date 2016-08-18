@@ -6,29 +6,10 @@ using System.Globalization;
 using System.Resources;
 using static Twilight.Internal.SunHelper;
 using System.Diagnostics;
+using Twilight.Internal;
 
 namespace Twilight
 {
-
-    public class SunPeriod
-    {
-        internal SunPeriod(DateTimeOffset? rise, DateTimeOffset? set, bool isAlwaysUp, bool isAlwaysDown)
-        {
-            Rise = rise;
-            Set = set;
-            IsAlwaysUp = isAlwaysUp;
-            IsAlwaysDown = isAlwaysDown;
-        }
-
-        public DateTimeOffset? Rise { get; }
-        public DateTimeOffset? Set { get; }
-
-        public bool IsAlwaysUp { get; }
-
-        public bool IsAlwaysDown { get; }
-    }
-
-
     public static class Sun
     {
         private static bool Between(DateTimeOffset datefrom, DateTimeOffset now, DateTimeOffset dateto) => (datefrom.Date < now.Date) && (now.Date < dateto.Date);
@@ -39,23 +20,14 @@ namespace Twilight
 
         private static SunPeriod CalculatePeriod(DateTimeOffset localDate, double lat, double lng, SunRiseTypes sunRiseTypes)
         {
-            if(localDate.Year < -2000)
+            ThrowHelper.CheckLat(lat);
+            ThrowHelper.CheckLng(lng);
+
+            if (localDate.Year < -2000)
                 throw new ArgumentOutOfRangeException(nameof(localDate));
 
             if(localDate.Year > 3000)
                 throw new ArgumentOutOfRangeException(nameof(localDate));
-
-            if(lat < -85.0)
-                throw new ArgumentOutOfRangeException(nameof(lat));
-
-            if(lat > 85.0)
-                throw new ArgumentOutOfRangeException(nameof(lat));
-
-            if(lng < -180.0)
-                throw new ArgumentOutOfRangeException(nameof(lng));
-
-            if(lng > 180.0)
-                throw new ArgumentOutOfRangeException(nameof(lng));
 
             var jday = GetJulianDay(localDate.Date);
 

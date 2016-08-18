@@ -12,52 +12,8 @@ using Xunit.Sdk;
 
 namespace Twilight.Test
 {
-    public class SunTests
+    public class SunTests:TestBase
     {
-        public static double ConvertDegreeAngleToDouble(string point)
-        {
-            //Example: 17.21.18S
-
-            //Degrees Lat Long    51.5000000°, -000.1300000°
-            //Degrees Minutes 51°30.00000', 000°07.80000'
-            //Degrees Minutes Seconds     51°30'00.0000", 000°07'48.0000"
-
-            var multiplier = (point.Contains("S") || point.Contains("W")) ? -1 : 1; //handle south and west
-
-            point = Regex.Replace(point, "[^0-9.]", "."); //remove the characters
-
-            var pointArray = point.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries); //split the string.
-
-            //Decimal degrees = 
-            //   whole number of degrees, 
-            //   plus minutes divided by 60, 
-            //   plus seconds divided by 3600
-
-            var degrees = Double.Parse(pointArray[0]);
-            var minutes = Double.Parse(pointArray[1]) / 60;
-            //var seconds = Double.Parse(pointArray[2]) / 3600;
-
-            return (degrees + minutes /*+ seconds*/) * multiplier;
-        }
-
-        private void Test(string dateTime, string lat, string lng, string sunrise, string sunset, bool isAlwaysUp,bool isAlwaysDown, Func<DateTimeOffset, double, double, SunPeriod> fun)
-        {
-            //const string pattern = "yyyy-MM-dd'T'HH:mm:ss.FFFK";
-            const string pattern = "yyyy-MM-dd'T'HH:mm:ssK";
-            DateTimeOffset inputOffset = DateTimeOffset.ParseExact(dateTime, pattern, CultureInfo.InvariantCulture);
-            DateTimeOffset sunriseOffset = DateTimeOffset.ParseExact(sunrise, pattern, CultureInfo.InvariantCulture);
-            DateTimeOffset sunsetOffset = DateTimeOffset.ParseExact(sunset, pattern, CultureInfo.InvariantCulture);
-
-            double dLat = ConvertDegreeAngleToDouble(lat);
-            double dLng = ConvertDegreeAngleToDouble(lng);
-
-            SunPeriod sp = fun(inputOffset, dLat, dLng);
-
-            sp.Rise.Should().Be(sunriseOffset, "SunRise");
-            sp.Set.Should().Be(sunsetOffset, "SunSet");
-            sp.IsAlwaysUp.Should().Be(isAlwaysUp);
-            sp.IsAlwaysDown.Should().Be(isAlwaysDown);
-        }
 
 
         [Theory]

@@ -2,9 +2,9 @@ using System;
 
 namespace Twilight
 {
-    public class Period
+    public sealed class MoonPeriod
     {
-        internal Period(DateTime? rise, DateTime? set, bool isAlwaysUp, bool isAlwaysDown)
+        internal MoonPeriod(DateTimeOffset? rise, DateTimeOffset? set, bool isAlwaysUp, bool isAlwaysDown)
         {
             Rise = rise;
             Set = set;
@@ -12,8 +12,8 @@ namespace Twilight
             IsAlwaysDown = isAlwaysDown;
         }
 
-        public DateTime? Rise { get; }
-        public DateTime? Set { get; }
+        public DateTimeOffset? Rise { get; }
+        public DateTimeOffset? Set { get; }
 
         public bool IsAlwaysUp { get; }
 

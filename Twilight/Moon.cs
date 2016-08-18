@@ -41,17 +41,19 @@ namespace Twilight
         //}
 
 
-        public static Period MoonTimes(DateTime localDate, TimeZoneInfo timeZone, double lat, double lng)
+        public static MoonPeriod MoonTimes(DateTimeOffset localDate, double lat, double lng)
         {
-            var offset = timeZone.GetUtcOffset(localDate);
+            ThrowHelper.CheckLat(lat);
+            ThrowHelper.CheckLng(lng);
 
-            DateTime newDateTime = localDate.Date - offset;
+
+            DateTime newDateTime = localDate.Date - localDate.Offset;
 
             var retval = MoonHelper.getMoonTimes(newDateTime, lat, lng);
 
-            return new Period(
-                retval.Rise.HasValue ? retval.Rise + offset : (DateTime?)null,
-                retval.Set.HasValue ? retval.Set + offset : (DateTime?)null,
+            return new MoonPeriod(
+                retval.Rise.HasValue ? retval.Rise + localDate.Offset : (DateTime?)null,
+                retval.Set.HasValue ? retval.Set + localDate.Offset : (DateTime?)null,
                 retval.IsAlwaysUp, retval.IsAlwaysDown);
 
 

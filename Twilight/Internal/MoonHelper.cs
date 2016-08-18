@@ -79,7 +79,7 @@ namespace Twilight.Internal
 
         // calculations for moon rise/set times are based on http://www.stargazing.net/kepler/moonrise.html article
 
-        internal static Period getMoonTimes(DateTime t, double lat, double lng)
+        internal static MoonPeriod getMoonTimes(DateTime t, double lat, double lng)
         {
             //var t = new Date(date);
             //if (inUTC) t.setUTCHours(0, 0, 0, 0);
@@ -130,7 +130,7 @@ namespace Twilight.Internal
                 h0 = h2;
             }
 
-            return new Period(
+            return new MoonPeriod(
                 !double.IsNaN(rise) ? hoursLater(t, rise) : (DateTime?)null,
                 !double.IsNaN(set) ? hoursLater(t, set) : (DateTime?)null,
                 (double.IsNaN(rise) && double.IsNaN(set) && ye > 0),
