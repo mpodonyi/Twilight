@@ -62,12 +62,12 @@ namespace Twilight
         //}
 
 
-        public static MoonPeriod MoonTimes2(DateTimeOffset localDate, double lat, double lng)
+        public static MoonPeriod MoonPeriod(DateTimeOffset localDate, double lat, double lng)
         {
             ThrowHelper.CheckLat(lat);
             ThrowHelper.CheckLng(lng);
 
-            return MoonHelper2.compute(lat, lng, localDate);
+            return MoonHelper2.CalcMoonriseSet(lat, lng, localDate);
         }
     }
 }

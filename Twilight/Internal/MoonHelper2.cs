@@ -241,7 +241,7 @@ namespace Twilight.Internal
 
 
         // calculate moonrise and moonset times
-        private static MoonPeriod riseset(double lat,double lon, DateTimeOffset offset)
+        internal static MoonPeriod CalcMoonriseSet(double lat, double lon, DateTimeOffset date)
         {
             int k;
             int i, j;
@@ -314,8 +314,8 @@ namespace Twilight.Internal
             }
 
 
-            DateTimeOffset? moonrise = new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int)Rise_time[0], (int)Rise_time[1], 0, offset.Offset);
-            DateTimeOffset? moonset = new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int)Set_time[0], (int)Set_time[1], 0, offset.Offset);
+            DateTimeOffset? moonrise = new DateTimeOffset(date.Year, date.Month, date.Day, (int)Rise_time[0], (int)Rise_time[1], 0, date.Offset);
+            DateTimeOffset? moonset = new DateTimeOffset(date.Year, date.Month, date.Day, (int)Set_time[0], (int)Set_time[1], 0, date.Offset);
             MoonPeriodTypes moonPeriodType = MoonPeriodTypes.RiseAndSet;
 
 
@@ -388,22 +388,7 @@ namespace Twilight.Internal
 
 
 
-        internal static MoonPeriod compute(double lat, double lon, DateTimeOffset date)
-        {
-            //  showdate(Now);
-
-            
-            //    save_latlon();	//changed by AWK
-
-            return riseset(lat, lon, date);
-
-
-
-
-
-
-        }
-
+       
 
 
     }

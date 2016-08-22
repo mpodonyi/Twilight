@@ -1,4 +1,5 @@
 using System;
+using static System.Math;
 
 namespace Twilight.Internal
 {
@@ -26,10 +27,10 @@ namespace Twilight.Internal
                 docmonth += 12;
             }
 
-            var a = Math.Floor(docyear / 100);
-            var b = 2 - a + Math.Floor(a / 4);
+            var a = Floor(docyear / 100);
+            var b = 2 - a + Floor(a / 4);
 
-            return Math.Floor(365.25 * (docyear + 4716)) + Math.Floor(30.6001 * (docmonth + 1)) + docday + b - 1524.5;
+            return Floor(365.25 * (docyear + 4716)) + Floor(30.6001 * (docmonth + 1)) + docday + b - 1524.5;
         }
 
         internal static double CalcTimeJulianCentury(double jd)
@@ -43,15 +44,15 @@ namespace Twilight.Internal
             return 23.0 + (26.0 + (seconds / 60.0)) / 60.0; // in degrees
         }
 
-        internal static double DegToRad(double angle) => angle * (Math.PI / 180.0);
+        internal static double DegToRad(double angle) => angle * (PI / 180.0);
 
-        internal static double RadToDeg(double angle) => angle * (180.0 / Math.PI);
+        internal static double RadToDeg(double angle) => angle * (180.0 / PI);
 
         internal static double CalcObliquityCorrection(double t)
         {
             var e0 = CalcMeanObliquityOfEcliptic(t);
             var omega = 125.04 - 1934.136 * t;
-            return e0 + 0.00256 * Math.Cos(DegToRad(omega));  // in degrees
+            return e0 + 0.00256 * Cos(DegToRad(omega));  // in degrees
         }
 
         internal static double CalcGeomMeanLongSun(double t)
@@ -86,14 +87,14 @@ namespace Twilight.Internal
             var e = CalcEccentricityEarthOrbit(t);
             var m = CalcGeomMeanAnomalySun(t);
 
-            var y = Math.Tan(DegToRad(epsilon) / 2.0);
+            var y = Tan(DegToRad(epsilon) / 2.0);
             y *= y;
 
-            var sin2L0 = Math.Sin(2.0 * DegToRad(l0));
-            var sinm = Math.Sin(DegToRad(m));
-            var cos2L0 = Math.Cos(2.0 * DegToRad(l0));
-            var sin4L0 = Math.Sin(4.0 * DegToRad(l0));
-            var sin2M = Math.Sin(2.0 * DegToRad(m));
+            var sin2L0 = Sin(2.0 * DegToRad(l0));
+            var sinm = Sin(DegToRad(m));
+            var cos2L0 = Cos(2.0 * DegToRad(l0));
+            var sin4L0 = Sin(4.0 * DegToRad(l0));
+            var sin2M = Sin(2.0 * DegToRad(m));
 
             var etime = y * sin2L0 - 2.0 * e * sinm + 4.0 * e * y * sinm * cos2L0 - 0.5 * y * y * sin4L0 - 1.25 * e * e * sin2M;
             return RadToDeg(etime) * 4.0;   // in minutes of time
@@ -103,9 +104,9 @@ namespace Twilight.Internal
         {
             var m = CalcGeomMeanAnomalySun(t);
             var mrad = DegToRad(m);
-            var sinm = Math.Sin(mrad);
-            var sin2M = Math.Sin(mrad + mrad);
-            var sin3M = Math.Sin(mrad + mrad + mrad);
+            var sinm = Sin(mrad);
+            var sin2M = Sin(mrad + mrad);
+            var sin3M = Sin(mrad + mrad + mrad);
             return sinm * (1.914602 - t * (0.004817 + 0.000014 * t)) + sin2M * (0.019993 - 0.000101 * t) + sin3M * 0.000289;       // in degrees
         }
         internal static double CalcSunTrueLong(double t)
@@ -119,7 +120,7 @@ namespace Twilight.Internal
         {
             var o = CalcSunTrueLong(t);
             var omega = 125.04 - 1934.136 * t;
-            return o - 0.00569 - 0.00478 * Math.Sin(DegToRad(omega)); // in degrees
+            return o - 0.00569 - 0.00478 * Sin(DegToRad(omega)); // in degrees
         }
 
         internal static double CalcSunDeclination(double t)
@@ -127,8 +128,8 @@ namespace Twilight.Internal
             var e = CalcObliquityCorrection(t);
             var lambda = CalcSunApparentLong(t);
 
-            var sint = Math.Sin(DegToRad(e)) * Math.Sin(DegToRad(lambda));
-            return RadToDeg(Math.Asin(sint));  // in degrees
+            var sint = Sin(DegToRad(e)) * Sin(DegToRad(lambda));
+            return RadToDeg(Asin(sint));  // in degrees
         }
 
         internal static double CalcHourAngleSunrise(double lat, double solarDec, SunRiseTypes sunRiseTypes)
@@ -151,13 +152,13 @@ namespace Twilight.Internal
 
             var latRad = DegToRad(lat);
             var sdRad = DegToRad(solarDec);
-            var hAarg = (Math.Cos(DegToRad(zenith)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad));
-            return Math.Acos(hAarg); // in radians (for sunset, use -HA)
+            var hAarg = (Cos(DegToRad(zenith)) / (Cos(latRad) * Cos(sdRad)) - Tan(latRad) * Tan(sdRad));
+            return Acos(hAarg); // in radians (for sunset, use -HA)
         }
 
         internal static double CalcDayOfYearFromJulianDay(double jd)
         {
-            var z = Math.Floor(jd + 0.5);
+            var z = Floor(jd + 0.5);
             var f = (jd + 0.5) - z;
             double a;
             if (z < 2299161)
@@ -166,19 +167,19 @@ namespace Twilight.Internal
             }
             else
             {
-                var alpha = Math.Floor((z - 1867216.25) / 36524.25);
-                a = z + 1 + alpha - Math.Floor(alpha / 4);
+                var alpha = Floor((z - 1867216.25) / 36524.25);
+                a = z + 1 + alpha - Floor(alpha / 4);
             }
             var b = a + 1524;
-            var c = Math.Floor((b - 122.1) / 365.25);
-            var d = Math.Floor(365.25 * c);
-            var e = Math.Floor((b - d) / 30.6001);
-            var day = b - d - Math.Floor(30.6001 * e) + f;
+            var c = Floor((b - 122.1) / 365.25);
+            var d = Floor(365.25 * c);
+            var e = Floor((b - d) / 30.6001);
+            var day = b - d - Floor(30.6001 * e) + f;
             var month = (e < 14) ? e - 1 : e - 13;
             var year = (month > 2) ? c - 4716 : c - 4715;
 
             var k = (DateTime.IsLeapYear((int)year) ? 1 : 2);
-            return Math.Floor((275 * month) / 9) - k * Math.Floor((month + 9) / 12) + day - 30;
+            return Floor((275 * month) / 9) - k * Floor((month + 9) / 12) + day - 30;
         }
 
         internal static double CalcSunriseSetUtc(bool rise, double jd, double latitude, double longitude, SunRiseTypes sunRiseTypes)
@@ -202,7 +203,7 @@ namespace Twilight.Internal
                 throw new Exception("error");
             }
 
-            var z = Math.Floor(jd + 0.5);
+            var z = Floor(jd + 0.5);
             var f = (jd + 0.5) - z;
             double a;
             if (z < 2299161)
@@ -211,14 +212,14 @@ namespace Twilight.Internal
             }
             else
             {
-                var alpha = Math.Floor((z - 1867216.25) / 36524.25);
-                a = z + 1 + alpha - Math.Floor(alpha / 4);
+                var alpha = Floor((z - 1867216.25) / 36524.25);
+                a = z + 1 + alpha - Floor(alpha / 4);
             }
             var b = a + 1524;
-            var c = Math.Floor((b - 122.1) / 365.25);
-            var d = Math.Floor(365.25 * c);
-            var e = Math.Floor((b - d) / 30.6001);
-            var day = b - d - Math.Floor(30.6001 * e) + f;
+            var c = Floor((b - 122.1) / 365.25);
+            var d = Floor(365.25 * c);
+            var e = Floor((b - d) / 30.6001);
+            var day = b - d - Floor(30.6001 * e) + f;
             var month = (e < 14) ? e - 1 : e - 13;
             var year = ((month > 2) ? c - 4716 : c - 4715);
 
@@ -286,9 +287,6 @@ namespace Twilight.Internal
 
         //---------------------------
 
-
-        private static readonly TimeSpan DayStart = TimeSpan.FromMinutes(0);
-        private static readonly TimeSpan DayEnd = TimeSpan.FromMinutes(1440);
 
 
         internal static DateTimeOffset DateBuilder(DateTimeOffset origDay, double time)
