@@ -12,6 +12,13 @@ namespace Twilight
             IsAlwaysDown = isAlwaysDown;
         }
 
+        internal MoonPeriod(DateTimeOffset? rise, DateTimeOffset? set, MoonPeriod2Type moonPeriodToday)
+        {
+            Rise = rise;
+            Set = set;
+            MoonPeriodToday = moonPeriodToday;
+        }
+
         public DateTimeOffset? Rise { get; }
         public DateTimeOffset? Set { get; }
 
@@ -19,5 +26,19 @@ namespace Twilight
 
         public bool IsAlwaysDown { get; }
 
+        public MoonPeriod2Type MoonPeriodToday { get; }
+
     }
+
+
+    public enum MoonPeriod2Type : byte
+    {
+        RiseAndSet,
+        RiseOnly,
+        SetOnly,
+        UpAllDay,
+        DownAllDay,
+    }
+
+   
 }

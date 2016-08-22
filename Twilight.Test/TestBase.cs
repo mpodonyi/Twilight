@@ -37,7 +37,7 @@ namespace Twilight.Test
             return (degrees + minutes /*+ seconds*/) * multiplier;
         }
 
-        protected void Test(string dateTime, string lat, string lng, string rise, string set, bool isAlwaysUp, bool isAlwaysDown, Func<DateTimeOffset, double, double, dynamic> fun)
+        protected void SunTest(string dateTime, string lat, string lng, string rise, string set, bool isAlwaysUp, bool isAlwaysDown, Func<DateTimeOffset, double, double, SunPeriod> fun)
         {
             //const string pattern = "yyyy-MM-dd'T'HH:mm:ss.FFFK";
             const string pattern = "yyyy-MM-dd'T'HH:mm:ssK";
@@ -48,12 +48,31 @@ namespace Twilight.Test
             double dLat = ConvertDegreeAngleToDouble(lat);
             double dLng = ConvertDegreeAngleToDouble(lng);
 
-            dynamic sp = fun(inputOffset, dLat, dLng);
+            SunPeriod sp = fun(inputOffset, dLat, dLng);
 
-            ((DateTimeOffset?)sp.Rise).Should().Be(riseOffset, "Rise");
-            ((DateTimeOffset?)sp.Set).Should().Be(setOffset, "Set");
-            ((bool)sp.IsAlwaysUp).Should().Be(isAlwaysUp);
-            ((bool)sp.IsAlwaysDown).Should().Be(isAlwaysDown);
+            sp.Rise.Should().Be(riseOffset, "Rise");
+            sp.Set.Should().Be(setOffset, "Set");
+            sp.IsAlwaysUp.Should().Be(isAlwaysUp);
+            sp.IsAlwaysDown.Should().Be(isAlwaysDown);
+        }
+
+        protected void MoonTest(string dateTime, string lat, string lng, string rise, string set, bool isAlwaysUp, bool isAlwaysDown, Func<DateTimeOffset, double, double, MoonPeriod> fun)
+        {
+            //const string pattern = "yyyy-MM-dd'T'HH:mm:ss.FFFK";
+            const string pattern = "yyyy-MM-dd'T'HH:mm:ssK";
+            DateTimeOffset inputOffset = DateTimeOffset.ParseExact(dateTime, pattern, CultureInfo.InvariantCulture);
+            DateTimeOffset riseOffset = DateTimeOffset.ParseExact(rise, pattern, CultureInfo.InvariantCulture);
+            DateTimeOffset setOffset = DateTimeOffset.ParseExact(set, pattern, CultureInfo.InvariantCulture);
+
+            double dLat = ConvertDegreeAngleToDouble(lat);
+            double dLng = ConvertDegreeAngleToDouble(lng);
+
+            MoonPeriod sp = fun(inputOffset, dLat, dLng);
+
+            sp.Rise.Should().Be(riseOffset, "Rise");
+            sp.Set.Should().Be(setOffset, "Set");
+            sp.IsAlwaysUp.Should().Be(isAlwaysUp);
+            sp.IsAlwaysDown.Should().Be(isAlwaysDown);
         }
     }
 }

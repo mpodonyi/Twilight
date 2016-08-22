@@ -18,7 +18,7 @@ namespace Twilight.Internal
             bool gregorian;
             var Now = DateTimeOffset.Now;
 
-            var month = Now.Month + 1;
+            var month = Now.Month;
             var day = Now.Day;
             double year = Now.Year;
 
@@ -207,7 +207,7 @@ namespace Twilight.Internal
             if ((e > 1) || (e < 0))
                 e = (-b - d) / (2 * a);
 
-            time = k + e + 1 / 120;                      // time of an event + round up
+            time = k + e + 1.0 / 120.0;                      // time of an event + round up
             hr = Floor(time);
             min = Floor((time - hr) * 60);
 
@@ -241,7 +241,7 @@ namespace Twilight.Internal
 
 
         // calculate moonrise and moonset times
-        private static void riseset(double lat,double lon, DateTimeOffset offset)
+        private static Tuple<DateTimeOffset?, DateTimeOffset?> riseset(double lat,double lon, DateTimeOffset offset)
         {
             int k;
             int i, j;
@@ -249,20 +249,20 @@ namespace Twilight.Internal
             //    var zone = Math.round(Now.getTimezoneOffset()/60);
 
             //MP: offset here
-            double zone = 1.0; //parseFloat(document.calc.time_zone.value * 1.0);
+            double zone = -1;//offset.Offset.TotalMinutes/60;//    1.0; //parseFloat(document.calc.time_zone.value * 1.0);
             // end of corrections by AWK	
             var jdlp = julian_day();            // stored for Lunar Phase calculation
             var jd = jdlp - 2451545;           // Julian day relative to Jan 1.5, 2000
 
-            if ((sgn(zone) == sgn(lon)) && (zone != 0))
-            {
-                //MP: warning maybe
-                //window.alert("WARNING: time zone and longitude are incompatible! \nThis is warning only - calculations will be performed anyway." + "\n" + "Time zone=" + zone + "   sgn(Time zone)=" + sgn(zone) + "   sgn(longitude)=" + sgn(lon));
-            }
+            //if ((sgn(zone) == sgn(lon)) && (zone != 0))
+            //{
+            //    //MP: warning maybe
+            //    //window.alert("WARNING: time zone and longitude are incompatible! \nThis is warning only - calculations will be performed anyway." + "\n" + "Time zone=" + zone + "   sgn(Time zone)=" + sgn(zone) + "   sgn(longitude)=" + sgn(lon));
+            //}
 
 
             //MP: offset here
-            zone = 1.0 + DSTfact; //parseFloat(document.calc.time_zone.value * 1.0) + DSTfact;
+           // zone = 1.0 + DSTfact; //parseFloat(document.calc.time_zone.value * 1.0) + DSTfact;
 
             var mp = new double[3][];                     // create a 3x3 array
             for (i = 0; i < 3; i++)
@@ -301,7 +301,7 @@ namespace Twilight.Internal
 
             for (k = 0; k < 24; k++)                   // check each hour of this day
             {
-                double ph = (k + 1) / 24;
+                double ph = (k + 1.0) / 24.0;
 
                 RAn[2] = interpolate(mp[0][0], mp[1][0], mp[2][0], ph);
                 Dec[2] = interpolate(mp[0][1], mp[1][1], mp[2][1], ph);
@@ -313,56 +313,75 @@ namespace Twilight.Internal
                 VHz[0] = VHz[2];
             }
 
+            return Tuple.Create<DateTimeOffset?, DateTimeOffset?>(
+                new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int) Rise_time[0], (int) Rise_time[1], 0, offset.Offset),
+                new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int) Set_time[0], (int) Set_time[1], 0, offset.Offset)
+                );
+
             // display results
             // extensions and changes by AWK
-            calc.moonrise.value = zintstr(Rise_time[0], 2) + ":" + zintstr(Rise_time[1], 2);
-            calc.moonset.value = zintstr(Set_time[0], 2) + ":" + zintstr(Set_time[1], 2);
+            //calc.moonrise.value = zintstr(Rise_time[0], 2) + ":" + zintstr(Rise_time[1], 2);
+            //calc.moonset.value = zintstr(Set_time[0], 2) + ":" + zintstr(Set_time[1], 2);
 
-            var zoneInt = parseFloat(calc.time_zone.value * 1.0);
-            var dstInt = DSTfact;
-            var timeDiff = zoneInt + dstInt;
-            var timeDiffHours = Math.floor(timeDiff);
-            var timeDiffMinutes = (timeDiff - timeDiffHours) * 60;
-            dateLocal.setHours(Rise_time[0] + timeDiffHours, Rise_time[1] + timeDiffMinutes, 0);
-            var DayMonth = " ";
-            if (Now.getDate() != dateLocal.getDate()) { DayMonth = " /" + dateLocal.getDate() + " " + monthList[dateLocal.getMonth()].abbr + "/" };
-            if (Moonrise) { calc.moonriseUTC.value = zintstr(dateLocal.getHours(), 2) + ":" + zintstr(dateLocal.getMinutes(), 2) + DayMonth } else { calc.moonriseUTC.value = " " };
+            //var zoneInt = parseFloat(calc.time_zone.value * 1.0);
+            //var dstInt = DSTfact;
+            //var timeDiff = zoneInt + dstInt;
+            //var timeDiffHours = Math.floor(timeDiff);
+            //var timeDiffMinutes = (timeDiff - timeDiffHours) * 60;
+            //dateLocal.setHours(Rise_time[0] + timeDiffHours, Rise_time[1] + timeDiffMinutes, 0);
+            //var DayMonth = " ";
+            //if (Now.getDate() != dateLocal.getDate())
+            //{
+            //    DayMonth = " /" + dateLocal.getDate() + " " + monthList[dateLocal.getMonth()].abbr + "/"
+            //};
+            //if (Moonrise)
+            //{
+            //    calc.moonriseUTC.value = zintstr(dateLocal.getHours(), 2) + ":" + zintstr(dateLocal.getMinutes(), 2) + DayMonth
+            //}
+            //else
+            //{
+            //    calc.moonriseUTC.value = " "
+            //};
 
-            LunarCyclePhasesData(dateLocal);
-            MoonriseSec = ElapsedTime(firstNewMoon, dateLocal);
-            if (Moonrise) { calc.LunPhasRise.value = curMoonPhase(MoonriseSec) } else { calc.LunPhasRise.value = " " };
+            //LunarCyclePhasesData(dateLocal);
+            //MoonriseSec = ElapsedTime(firstNewMoon, dateLocal);
+            //if (Moonrise) { calc.LunPhasRise.value = curMoonPhase(MoonriseSec) } else { calc.LunPhasRise.value = " " };
 
-            var yNow = Now.getFullYear();
-            var mNow = Now.getMonth();
-            var dNow = Now.getDate();
-            dateLocal.setFullYear(yNow, mNow, dNow);
-            dateLocal.setHours(Set_time[0] + timeDiffHours, Set_time[1] + timeDiffMinutes, 0);
-            var DayMonth = " ";
-            if (Now.getDate() != dateLocal.getDate()) { DayMonth = " /" + dateLocal.getDate() + " " + monthList[dateLocal.getMonth()].abbr + "/" };
-            if (Moonset) { calc.moonsetUTC.value = zintstr(dateLocal.getHours(), 2) + ":" + zintstr(dateLocal.getMinutes(), 2) + DayMonth } else { calc.moonsetUTC.value = " " };
-            LunarCyclePhasesData(dateLocal);
-            MoonsetSec = ElapsedTime(firstNewMoon, dateLocal);
-            if (Moonset) { calc.LunPhasSet.value = curMoonPhase(MoonsetSec) } else { calc.LunPhasSet.value = " " };
+            //var yNow = Now.getFullYear();
+            //var mNow = Now.getMonth();
+            //var dNow = Now.getDate();
+            //dateLocal.setFullYear(yNow, mNow, dNow);
+            //dateLocal.setHours(Set_time[0] + timeDiffHours, Set_time[1] + timeDiffMinutes, 0);
+            //var DayMonth = " ";
+            //if (Now.getDate() != dateLocal.getDate()) { DayMonth = " /" + dateLocal.getDate() + " " + monthList[dateLocal.getMonth()].abbr + "/" };
+            //if (Moonset) { calc.moonsetUTC.value = zintstr(dateLocal.getHours(), 2) + ":" + zintstr(dateLocal.getMinutes(), 2) + DayMonth } else { calc.moonsetUTC.value = " " };
+            //LunarCyclePhasesData(dateLocal);
+            //MoonsetSec = ElapsedTime(firstNewMoon, dateLocal);
+            //if (Moonset) { calc.LunPhasSet.value = curMoonPhase(MoonsetSec) } else { calc.LunPhasSet.value = " " };
 
-            if (Moonrise) { calc.azRise.value = frealstr(Rise_az, 5, 1) + "°" } else { calc.azRise.value = " " };
-            if (Moonset) { calc.azSet.value = frealstr(Set_az, 5, 1) + "°" } else { calc.azSet.value = " " };
-            // END of extensions and changes by AWK
-            special_message();
+            //if (Moonrise) { calc.azRise.value = frealstr(Rise_az, 5, 1) + "°" } else { calc.azRise.value = " " };
+            //if (Moonset) { calc.azSet.value = frealstr(Set_az, 5, 1) + "°" } else { calc.azSet.value = " " };
+            //// END of extensions and changes by AWK
+            //special_message();
         }
 
 
 
-        internal static void compute(double lat, double lon, DateTimeOffset date)
+        internal static MoonPeriod compute(double lat, double lon, DateTimeOffset date)
         {
+            //  showdate(Now);
+
             
+            //    save_latlon();	//changed by AWK
+
+            var retval = riseset(lat, lon, date);
+
+            return new MoonPeriod(retval.Item1, retval.Item2, false, false);
 
 
 
 
-                  //  showdate(Now);
 
-                    riseset(lat, lon, date);
-                    //    save_latlon();	//changed by AWK
         }
 
 
