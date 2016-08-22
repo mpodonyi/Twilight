@@ -2,21 +2,31 @@ using System;
 
 namespace Twilight
 {
+    public enum SunPeriodTypes : byte
+    {
+        RiseAndSet = 0,
+        RiseOnly,
+        SetOnly,
+        UpAllDay,
+        DownAllDay,
+    }
+
     public sealed class SunPeriod
     {
-        internal SunPeriod(DateTimeOffset? rise, DateTimeOffset? set, bool isAlwaysUp, bool isAlwaysDown)
+        
+
+
+        internal SunPeriod(DateTimeOffset? rise, DateTimeOffset? set, SunPeriodTypes sunPeriodType)
         {
             Rise = rise;
             Set = set;
-            IsAlwaysUp = isAlwaysUp;
-            IsAlwaysDown = isAlwaysDown;
+            SunPeriodType = sunPeriodType;
+            
         }
 
         public DateTimeOffset? Rise { get; }
         public DateTimeOffset? Set { get; }
 
-        public bool IsAlwaysUp { get; }
-
-        public bool IsAlwaysDown { get; }
+        public SunPeriodTypes SunPeriodType { get; }
     }
 }

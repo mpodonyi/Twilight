@@ -130,21 +130,16 @@ namespace Twilight.Internal
                 h0 = h2;
             }
 
-            return new MoonPeriod(
-                !double.IsNaN(rise) ? hoursLater(t, rise) : (DateTime?)null,
-                !double.IsNaN(set) ? hoursLater(t, set) : (DateTime?)null,
-                (double.IsNaN(rise) && double.IsNaN(set) && ye > 0),
-                (double.IsNaN(rise) && double.IsNaN(set) && ye <= 0)
-                );
+            throw new NotImplementedException();
 
-            //var result = { };
+            //return new MoonPeriod(
+            //    !double.IsNaN(rise) ? hoursLater(t, rise) : (DateTime?)null,
+            //    !double.IsNaN(set) ? hoursLater(t, set) : (DateTime?)null,
+            //    (double.IsNaN(rise) && double.IsNaN(set) && ye > 0),
+            //    (double.IsNaN(rise) && double.IsNaN(set) && ye <= 0)
+            //    );
 
-            //if (rise) result.rise = hoursLater(t, rise);
-            //if (set) result.set = hoursLater(t, set);
-
-            //if (!rise && !set) result[ye > 0 ? 'alwaysUp' : 'alwaysDown'] = true;
-
-            //return result;
+           
         }
 
 

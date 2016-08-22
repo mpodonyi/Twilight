@@ -37,7 +37,7 @@ namespace Twilight.Test
             return (degrees + minutes /*+ seconds*/) * multiplier;
         }
 
-        protected void SunTest(string dateTime, string lat, string lng, string rise, string set, bool isAlwaysUp, bool isAlwaysDown, Func<DateTimeOffset, double, double, SunPeriod> fun)
+        protected void SunTest(string dateTime, string lat, string lng, string rise, string set, SunPeriodTypes sunPeriodType, Func<DateTimeOffset, double, double, SunPeriod> fun)
         {
             //const string pattern = "yyyy-MM-dd'T'HH:mm:ss.FFFK";
             const string pattern = "yyyy-MM-dd'T'HH:mm:ssK";
@@ -52,11 +52,10 @@ namespace Twilight.Test
 
             sp.Rise.Should().Be(riseOffset, "Rise");
             sp.Set.Should().Be(setOffset, "Set");
-            sp.IsAlwaysUp.Should().Be(isAlwaysUp);
-            sp.IsAlwaysDown.Should().Be(isAlwaysDown);
+            sp.SunPeriodType.Should().Be(sunPeriodType);
         }
 
-        protected void MoonTest(string dateTime, string lat, string lng, string rise, string set, bool isAlwaysUp, bool isAlwaysDown, Func<DateTimeOffset, double, double, MoonPeriod> fun)
+        protected void MoonTest(string dateTime, string lat, string lng, string rise, string set, MoonPeriodTypes moonPeriodType, Func<DateTimeOffset, double, double, MoonPeriod> fun)
         {
             //const string pattern = "yyyy-MM-dd'T'HH:mm:ss.FFFK";
             const string pattern = "yyyy-MM-dd'T'HH:mm:ssK";
@@ -71,8 +70,7 @@ namespace Twilight.Test
 
             sp.Rise.Should().Be(riseOffset, "Rise");
             sp.Set.Should().Be(setOffset, "Set");
-            sp.IsAlwaysUp.Should().Be(isAlwaysUp);
-            sp.IsAlwaysDown.Should().Be(isAlwaysDown);
+            sp.MoonPeriodType.Should().Be(moonPeriodType);
         }
     }
 }

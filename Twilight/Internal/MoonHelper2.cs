@@ -241,7 +241,7 @@ namespace Twilight.Internal
 
 
         // calculate moonrise and moonset times
-        private static Tuple<DateTimeOffset?, DateTimeOffset?> riseset(double lat,double lon, DateTimeOffset offset)
+        private static MoonPeriod riseset(double lat,double lon, DateTimeOffset offset)
         {
             int k;
             int i, j;
@@ -313,10 +313,31 @@ namespace Twilight.Internal
                 VHz[0] = VHz[2];
             }
 
-            return Tuple.Create<DateTimeOffset?, DateTimeOffset?>(
-                new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int) Rise_time[0], (int) Rise_time[1], 0, offset.Offset),
-                new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int) Set_time[0], (int) Set_time[1], 0, offset.Offset)
-                );
+
+            DateTimeOffset? moonrise = new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int)Rise_time[0], (int)Rise_time[1], 0, offset.Offset);
+            DateTimeOffset? moonset = new DateTimeOffset(offset.Year, offset.Month, offset.Day, (int)Set_time[0], (int)Set_time[1], 0, offset.Offset);
+            MoonPeriodTypes moonPeriodType = MoonPeriodTypes.RiseAndSet;
+
+
+            if ((!Moonrise) && (!Moonset))               // neither moonrise nor moonset
+            {
+                if (VHz[2] < 0)
+                    moonPeriodType = MoonPeriodTypes.DownAllDay;
+                else
+                    moonPeriodType=MoonPeriodTypes.UpAllDay;
+
+                moonrise = moonset = null;
+            }
+            else                                       // moonrise or moonset
+            {
+                if (!Moonrise)
+                    moonPeriodType=MoonPeriodTypes.RiseOnly;
+                else if (!Moonset)
+                    moonPeriodType = MoonPeriodTypes.SetOnly;
+            }
+
+
+            return new MoonPeriod(moonrise,moonset,moonPeriodType);
 
             // display results
             // extensions and changes by AWK
@@ -374,9 +395,8 @@ namespace Twilight.Internal
             
             //    save_latlon();	//changed by AWK
 
-            var retval = riseset(lat, lon, date);
+            return riseset(lat, lon, date);
 
-            return new MoonPeriod(retval.Item1, retval.Item2, false, false);
 
 
 
