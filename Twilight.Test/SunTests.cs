@@ -28,6 +28,9 @@ namespace Twilight.Test
         }
 
 
+
+
+
         [Theory]
         [InlineData("London", "2016-08-09T10:10:10+01:00", "51°30'N", "0°08'W", "2016-08-09T04:58:00+01:00", "2016-08-09T21:12:00+01:00", SunPeriodTypes.RiseAndSet)]
         [InlineData("New Delhi", "2016-08-09T10:10:10+05:30", "28°37'N", "77°13'E", "2016-08-09T05:22:00+05:30", "2016-08-09T19:31:00+05:30", SunPeriodTypes.RiseAndSet)]

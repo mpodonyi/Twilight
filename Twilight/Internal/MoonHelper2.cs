@@ -11,12 +11,12 @@ namespace Twilight.Internal
     {
         // determine Julian day from calendar date
         // (Jean Meeus, "Astronomical Algorithms", Willmann-Bell, 1991)
-        private static double julian_day()                           // be carefull, the function of the similare name (Julian_Day) is used in astroAWK1.js library
+        private static double julian_day(DateTimeOffset date)                           // be carefull, the function of the similare name (Julian_Day) is used in astroAWK1.js library
                                                         // current function uses date in the form of "date object", while that other function uses three arguments of calendar date
         {
             double a, b, jd;
             bool gregorian;
-            var Now = DateTimeOffset.Now;
+            var Now = date;
 
             var month = Now.Month;
             var day = Now.Day;
@@ -51,16 +51,16 @@ namespace Twilight.Internal
             return rv;
         }
 
-        private static double[] Sky = {0.0, 0.0, 0.0};
-        private static double[] RAn = { 0.0, 0.0, 0.0 };
-        private static double[] Dec = { 0.0, 0.0, 0.0 };
-        private static double[] VHz = { 0.0, 0.0, 0.0 };
+        //private static double[] Sky = {0.0, 0.0, 0.0};
+        //private static double[] RAn = { 0.0, 0.0, 0.0 };
+        //private static double[] Dec = { 0.0, 0.0, 0.0 };
+        //private static double[] VHz = { 0.0, 0.0, 0.0 };
 
 
 
         // moon's position using fundamental arguments 
         // (Van Flandern & Pulkkinen, 1979)
-        private static void moon(double jd)
+        private static Tuple<double,double,double> moon(double jd)
         {
             double d, f, g, h, m, n, s, u, v, w;
 
@@ -123,20 +123,21 @@ namespace Twilight.Internal
             w = w - 0.00092 * Sin(2 * m - 2 * d);
 
             s = w / Sqrt(u - v * v);                  // compute moon's right ascension ...  
-            Sky[0] = h + Atan(s / Sqrt(1 - s * s));
+            double ra = h + Atan(s / Sqrt(1 - s * s));
 
             s = v / Sqrt(u);                        // declination ...
-            Sky[1] = Atan(s / Sqrt(1 - s * s));
+            double dec = Atan(s / Sqrt(1 - s * s));
 
-            Sky[2] = 60.40974 * Sqrt(u);          // and parallax
+            double para = 60.40974 * Sqrt(u);          // and parallax
+            return Tuple.Create(ra, dec, para);
         }
 
 
 
         private const double DR = PI / 180;
         private const double K1 = 15*DR*1.0027379;
-        private static double[] Rise_time = { 0, 0};
-        private static double[] Set_time = { 0, 0};
+        //private static double[] Rise_time = { 0, 0};
+        //private static double[] Set_time = { 0, 0};
         private static double Rise_az = 0.0;
         private static double Set_az = 0.0;
 
@@ -149,7 +150,7 @@ namespace Twilight.Internal
             return s * 360 * DR;
         }
 
-        private static int DSTfact = -1;
+        //private static int DSTfact = -1;
 
         // 3-point interpolation
         private static double interpolate(double f0, double f1, double f2, double p)
@@ -162,7 +163,7 @@ namespace Twilight.Internal
         }
 
         // test an hour for an event
-        private static double test_moon(int k, double zone, double t0, double lat, double plx)
+        private static double test_moon(int k, double zone, double t0, double lat, double plx, double[] RAn, double[] Dec, double[] VHz, ref bool moonrise, ref bool moonset, ref short moonriseInMinutes, ref short moonsetInMinutes)
         {
             double[] ha = { 0.0, 0.0, 0.0};
             double a, b, c, d, e, s, z;
@@ -210,6 +211,7 @@ namespace Twilight.Internal
             time = k + e + 1.0 / 120.0;                      // time of an event + round up
             hr = Floor(time);
             min = Floor((time - hr) * 60);
+            short timeMinutes = (short)(hr * 60 + min);
 
             hz = ha[0] + e * (ha[2] - ha[0]);            // azimuth of the moon at the event
             nz = -Cos(Dec[1]) * Sin(hz);
@@ -219,25 +221,27 @@ namespace Twilight.Internal
 
             if ((VHz[0] < 0) && (VHz[2] > 0))
             {
-                Rise_time[0] = hr;
-                Rise_time[1] = min;
+                moonriseInMinutes = timeMinutes;
+                //Rise_time[0] = hr;
+                //Rise_time[1] = min;
                 Rise_az = az;
-                Moonrise = true;
+                moonrise = true;
             }
 
             if ((VHz[0] > 0) && (VHz[2] < 0))
             {
-                Set_time[0] = hr;
-                Set_time[1] = min;
+                moonsetInMinutes = timeMinutes;
+                //Set_time[0] = hr;
+                //Set_time[1] = min;
                 Set_az = az;
-                Moonset = true;
+                moonset = true;
             }
 
             return VHz[2];
         }
 
-        private static bool Moonrise ;                          // initialize
-        private static bool Moonset ;
+        //private static bool Moonrise ;                          // initialize
+        //private static bool Moonset ;
 
 
         // calculate moonrise and moonset times
@@ -249,9 +253,9 @@ namespace Twilight.Internal
             //    var zone = Math.round(Now.getTimezoneOffset()/60);
 
             //MP: offset here
-            double zone = -1;//offset.Offset.TotalMinutes/60;//    1.0; //parseFloat(document.calc.time_zone.value * 1.0);
+            double zone = date.Offset.TotalHours * -1;//    1.0; //parseFloat(document.calc.time_zone.value * 1.0);
             // end of corrections by AWK	
-            var jdlp = julian_day();            // stored for Lunar Phase calculation
+            var jdlp = julian_day(date);            // stored for Lunar Phase calculation
             var jd = jdlp - 2451545;           // Julian day relative to Jan 1.5, 2000
 
             //if ((sgn(zone) == sgn(lon)) && (zone != 0))
@@ -264,13 +268,13 @@ namespace Twilight.Internal
             //MP: offset here
            // zone = 1.0 + DSTfact; //parseFloat(document.calc.time_zone.value * 1.0) + DSTfact;
 
-            var mp = new double[3][];                     // create a 3x3 array
-            for (i = 0; i < 3; i++)
-            {
-                mp[i] = new double[3];
-                for (j = 0; j < 3; j++)
-                    mp[i][j] = 0.0;
-            }
+            var mp = new double[3,3];                     // create a 3x3 array
+            //for (i = 0; i < 3; i++)
+            //{
+            //    mp[i] = new double[3];
+            //    for (j = 0; j < 3; j++)
+            //        mp[i][j] = 0.0;
+            //}
 
             lon = lon / 360;
             var tz = zone / 24;
@@ -280,33 +284,41 @@ namespace Twilight.Internal
 
             for (k = 0; k < 3; k++)
             {
-                moon(jd);
-                mp[k][0] = Sky[0];
-                mp[k][1] = Sky[1];
-                mp[k][2] = Sky[2];
+                var ret = moon(jd);
+                mp[k,0] = ret.Item1;
+                mp[k,1] = ret.Item2;
+                mp[k,2] = ret.Item3;
                 jd = jd + 0.5;
             }
 
-            if (mp[1][0] <= mp[0][0])
-                mp[1][0] = mp[1][0] + 2 * PI;
+            if (mp[1,0] <= mp[0,0])
+                mp[1,0] = mp[1,0] + 2 * PI;
 
-            if (mp[2][0] <= mp[1][0])
-                mp[2][0] = mp[2][0] + 2 * PI;
+            if (mp[2,0] <= mp[1,0])
+                mp[2,0] = mp[2,0] + 2 * PI;
 
-            RAn[0] = mp[0][0];
-            Dec[0] = mp[0][1];
 
-            Moonrise = false;                          // initialize
-            Moonset = false;
+            var RAn = new double[3];
+            var Dec = new double[3];
+            var VHz = new double[3];
+
+            RAn[0] = mp[0,0];
+            Dec[0] = mp[0,1];
+
+            bool Moonrise = false;                          // initialize
+            bool Moonset = false;
+            short moonriseTime=0;
+            short moonsetTime=0;
+
 
             for (k = 0; k < 24; k++)                   // check each hour of this day
             {
                 double ph = (k + 1.0) / 24.0;
 
-                RAn[2] = interpolate(mp[0][0], mp[1][0], mp[2][0], ph);
-                Dec[2] = interpolate(mp[0][1], mp[1][1], mp[2][1], ph);
+                RAn[2] = interpolate(mp[0,0], mp[1,0], mp[2,0], ph);
+                Dec[2] = interpolate(mp[0,1], mp[1,1], mp[2,1], ph);
 
-                VHz[2] = test_moon(k, zone, t0, lat, mp[1][2]);
+                VHz[2] = test_moon(k, zone, t0, lat, mp[1,2],RAn,Dec,VHz, ref Moonrise,ref Moonset,ref moonriseTime, ref moonsetTime);
 
                 RAn[0] = RAn[2];                       // advance to next hour
                 Dec[0] = Dec[2];
@@ -314,8 +326,8 @@ namespace Twilight.Internal
             }
 
 
-            DateTimeOffset? moonrise = new DateTimeOffset(date.Year, date.Month, date.Day, (int)Rise_time[0], (int)Rise_time[1], 0, date.Offset);
-            DateTimeOffset? moonset = new DateTimeOffset(date.Year, date.Month, date.Day, (int)Set_time[0], (int)Set_time[1], 0, date.Offset);
+            DateTimeOffset? moonrise = new DateTimeOffset(date.Year, date.Month, date.Day, 0, 0, 0, date.Offset).AddMinutes(moonriseTime);
+            DateTimeOffset? moonset = new DateTimeOffset(date.Year, date.Month, date.Day, 0, 0, 0, date.Offset).AddMinutes(moonsetTime);
             MoonPeriodTypes moonPeriodType = MoonPeriodTypes.RiseAndSet;
 
 
