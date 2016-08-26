@@ -18,7 +18,7 @@ namespace Twilight.Test
         //[InlineData("Alert", "2016-01-09T10:10:10-04:00", "82°31'N", "62°18'W", "2016-02-28T00:00:00-00:00", "2015-10-15T00:00:00-00:00", false, true)]
         public void MoonRiseSetTest(string city, string dateTimeOffset, string lat, string lng, string moonrise, string moonset, MoonPeriodTypes moonPeriodTypes)
         {
-            MoonTest(dateTimeOffset, lat, lng, moonrise, moonset, moonPeriodTypes, Moon.MoonPeriod);
+            MoonTest(dateTimeOffset, lat, lng, moonrise, moonset, moonPeriodTypes, Moon.Period);
         }
 
 

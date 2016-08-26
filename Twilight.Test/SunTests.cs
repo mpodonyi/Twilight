@@ -24,7 +24,7 @@ namespace Twilight.Test
         [InlineData("Alert", "2016-01-09T10:10:10-04:00", "82°31'N", "62°18'W", "2016-02-28T00:00:00-00:00", "2015-10-15T00:00:00-00:00", SunPeriodTypes.DownAllDay)]
         public void SunRiseSetTest(string city, string dateTimeOffset, string lat, string lng, string sunrise, string sunset, SunPeriodTypes sunPeriodTypes)
         {
-            SunTest(dateTimeOffset, lat, lng, sunrise, sunset, sunPeriodTypes, Sun.SunPeriod);
+            SunTest(dateTimeOffset, lat, lng, sunrise, sunset, sunPeriodTypes, Sun.Period);
         }
 
 

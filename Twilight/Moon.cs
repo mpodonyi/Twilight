@@ -62,7 +62,7 @@ namespace Twilight
         //}
 
 
-        public static MoonPeriod MoonPeriod(DateTimeOffset localDate, double lat, double lng)
+        public static MoonPeriod Period(DateTimeOffset localDate, double lat, double lng)
         {
             ThrowHelper.CheckLat(lat);
             ThrowHelper.CheckLng(lng);

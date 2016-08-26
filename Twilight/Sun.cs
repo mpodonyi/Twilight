@@ -34,7 +34,6 @@ namespace Twilight
             DateTimeOffset rise = CalcSunriseSet(true, jday, lat, lng, localDate, sunRiseTypes);
             DateTimeOffset set = CalcSunriseSet(false, jday, lat, lng, localDate, sunRiseTypes);
 
-
             SunPeriodTypes type= SunPeriodTypes.RiseAndSet;
             if( Between(rise, localDate, set))
                 type = SunPeriodTypes.UpAllDay;
@@ -49,7 +48,7 @@ namespace Twilight
 
       
 
-        public static SunPeriod SunPeriod(DateTimeOffset localDate, double lat, double lng) => CalculatePeriod(localDate, lat, lng, SunRiseTypes.Default);
+        public static SunPeriod Period(DateTimeOffset localDate, double lat, double lng) => CalculatePeriod(localDate, lat, lng, SunRiseTypes.Default);
 
         public static SunPeriod CivilPeriod(DateTimeOffset localDate,  double lat, double lng) => CalculatePeriod(localDate, lat, lng, SunRiseTypes.Civil);
 
