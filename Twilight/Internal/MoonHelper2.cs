@@ -343,9 +343,15 @@ namespace Twilight.Internal
             else                                       // moonrise or moonset
             {
                 if (!Moonrise)
-                    moonPeriodType=MoonPeriodTypes.RiseOnly;
-                else if (!Moonset)
+                {
                     moonPeriodType = MoonPeriodTypes.SetOnly;
+                    moonrise= null;
+                }
+                else if (!Moonset)
+                {
+                    moonPeriodType = MoonPeriodTypes.RiseOnly;
+                    moonset = null;
+                }
             }
 
 
