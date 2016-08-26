@@ -297,7 +297,7 @@ namespace Twilight.Internal
 
         }
 
-        internal static DateTimeOffset CalcSunriseSet(bool rise, double jd, double latitude, double longitude, DateTimeOffset dt, SunRiseTypes sunRiseTypes)
+        internal static DateTimeOffset? CalcSunriseSet(bool rise, double jd, double latitude, double longitude, DateTimeOffset dt, SunRiseTypes sunRiseTypes)
         {
             var timeUtc = CalcSunriseSetUtc(rise, jd, latitude, longitude, sunRiseTypes);
             var newTimeUtc = CalcSunriseSetUtc(rise, jd + timeUtc / 1440.0, latitude, longitude, sunRiseTypes);
@@ -306,38 +306,7 @@ namespace Twilight.Internal
                 return DateBuilder(dt, newTimeUtc);
             }
 
-            //no sunrise/ set found
-            var doy = CalcDayOfYearFromJulianDay(jd);
-            double jdy;
-            if (((latitude > 66.4) && (doy > 79) && (doy < 267)) || ((latitude < -66.4) && ((doy < 83) || (doy > 263))))
-            {   
-                //isAlwaysUp
-                //previous sunrise/next sunset
-                if (rise)
-                { // find previous sunrise
-                    jdy = CalcJulianDayOfNextPrevRiseSet(false, true, jd, latitude, longitude, dt.Offset, sunRiseTypes);
-                }
-                else
-                { // find next sunset
-                    jdy = CalcJulianDayOfNextPrevRiseSet(true, false, jd, latitude, longitude, dt.Offset, sunRiseTypes);
-                }
-
-                return DateFromJulianDay(jdy);//, false, 3);
-            }
-            else
-            {   
-                //isAlwaysDown
-                //previous sunset/next sunrise
-                if (rise)
-                { // find previous sunrise
-                    jdy = CalcJulianDayOfNextPrevRiseSet(true, true, jd, latitude, longitude, dt.Offset, sunRiseTypes);
-                }
-                else
-                { // find next sunset
-                    jdy = CalcJulianDayOfNextPrevRiseSet(false, false, jd, latitude, longitude, dt.Offset, sunRiseTypes);
-                }
-                return DateFromJulianDay(jdy);//, false, 3);
-            }
+            return null;
         }
 
 
