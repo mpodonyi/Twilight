@@ -1,0 +1,1 @@
+dotnet pack Twilight --configuration Release --output nupkgs

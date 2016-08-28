@@ -1,4 +1,21 @@
 ﻿{
+  "version": "0.1.0-*",
+  "authors": [ "Anne", "Bob" ],
+  "packOptions": {
+    "summary": "This is my library.",
+    "tags": [ "hyperscale", "cats" ],
+    "owners": [ "Fabrikam", "Microsoft" ],
+    "releaseNotes": "Initial version, implemented flimflams.",
+    "iconUrl": "http://www.mylibrary.gov/favicon.ico",
+    "projectUrl": "http://www.mylibrary.gov",
+    "licenseUrl": "http://www.mylibrary.gov/licence",
+    "requireLicenseAcceptance": false,
+    "repository": {
+      "type": "git",
+      "url": "http://github.com/dotnet/corefx"
+
+    }
+  },
   "supports": {},
   "dependencies": {
     "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
