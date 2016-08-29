@@ -60,7 +60,7 @@ namespace Twilight.Test
             //const string pattern = "yyyy-MM-dd'T'HH:mm:ss.FFFK";
             const string pattern = "yyyy-MM-dd'T'HH:mm:ssK";
 
-            DateTimeOffset inputOffset = DateTimeOffset.Parse(dateTime, CultureInfo.InvariantCulture);
+            DateTimeOffset inputOffset = DateTimeOffset.ParseExact(dateTime, pattern, CultureInfo.InvariantCulture);
             DateTimeOffset? riseOffset = rise == null? (DateTimeOffset?) null : DateTimeOffset.ParseExact(rise,pattern, CultureInfo.InvariantCulture);
             DateTimeOffset? setOffset = set == null ? (DateTimeOffset?) null : DateTimeOffset.ParseExact(set,pattern, CultureInfo.InvariantCulture);
 

@@ -45,10 +45,12 @@
     <Compile Include="Moon.cs" />
     <Compile Include="Internal\MoonHelper.cs" />
     <Compile Include="MoonPeriod.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sun.cs" />
     <Compile Include="Internal\SunHelper.cs" />
     <Compile Include="SunPeriod.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

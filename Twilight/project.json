@@ -1,21 +1,29 @@
 ﻿{
   "version": "0.1.0-*",
-  "authors": [ "Anne", "Bob" ],
+  "name": "Twilight",
+  "title": "Twilight",
+  //"description": "Twilight is a Library which calculates various Astronomical values",
+  "language": "en-US",
+  "authors": [ "Mike Podonyi" ],
   "packOptions": {
-    "summary": "This is my library.",
-    "tags": [ "hyperscale", "cats" ],
-    "owners": [ "Fabrikam", "Microsoft" ],
-    "releaseNotes": "Initial version, implemented flimflams.",
-    "iconUrl": "http://www.mylibrary.gov/favicon.ico",
-    "projectUrl": "http://www.mylibrary.gov",
-    "licenseUrl": "http://www.mylibrary.gov/licence",
+    "summary": "Twilight is a Library which calculates Sun and Moon Rise and Set.",
+    "tags": [ "sunrise", "sunset", "civil", "astronomical", "nautical", "moonrise", "moonset" ],
+    "owners": [ "Mike Podonyi" ],
+    "releaseNotes": "Initial version.",
+    //"iconUrl": "http://www.mylibrary.gov/favicon.ico",
+    "projectUrl": "http://github.com/mpodonyi/Twilight",
+    "licenseUrl": "http://github.com/mpodonyi/Twilight/blob/master/LICENSE",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
-      "url": "http://github.com/dotnet/corefx"
-
+      "url": "http://github.com/mpodonyi/Twilight"
     }
   },
+  "buildOptions": {
+    "debugType": "portable"
+  },
+
+
   "supports": {},
   "dependencies": {
     "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
