@@ -7,60 +7,11 @@ using static System.Math;
 
 namespace Twilight.Internal
 {
-    class MoonHelper2
+    static class MoonHelper
     {
-        // determine Julian day from calendar date
-        // (Jean Meeus, "Astronomical Algorithms", Willmann-Bell, 1991)
-        private static double julian_day(DateTimeOffset date)                           // be carefull, the function of the similare name (Julian_Day) is used in astroAWK1.js library
-                                                        // current function uses date in the form of "date object", while that other function uses three arguments of calendar date
-        {
-            double a, b, jd;
-            bool gregorian;
-            var Now = date;
-
-            var month = Now.Month;
-            var day = Now.Day;
-            double year = Now.Year;
-
-            gregorian = (!(year < 1583));
-
-            if ((month == 1) || (month == 2))
-            {
-                year = year - 1;
-                month = month + 12;
-            }
-
-            a = Floor(year / 100);
-            if (gregorian) b = 2 - a + Floor(a / 4);
-            else b = 0.0;
-
-            jd = Floor(365.25 * (year + 4716))
-               + Floor(30.6001 * (month + 1))
-               + day + b - 1524.5;
-
-            return jd;
-        }
-
-        // returns value for sign of argument
-        private static sbyte sgn(double x)
-        {
-            sbyte rv;
-            if (x > 0.0) rv = 1;
-            else if (x < 0.0) rv = -1;
-            else rv = 0;
-            return rv;
-        }
-
-        //private static double[] Sky = {0.0, 0.0, 0.0};
-        //private static double[] RAn = { 0.0, 0.0, 0.0 };
-        //private static double[] Dec = { 0.0, 0.0, 0.0 };
-        //private static double[] VHz = { 0.0, 0.0, 0.0 };
-
-
-
         // moon's position using fundamental arguments 
         // (Van Flandern & Pulkkinen, 1979)
-        private static Tuple<double,double,double> moon(double jd)
+        private static Tuple<double, double, double> GetMoonPosition(double jd)
         {
             double d, f, g, h, m, n, s, u, v, w;
 
@@ -131,6 +82,60 @@ namespace Twilight.Internal
             double para = 60.40974 * Sqrt(u);          // and parallax
             return Tuple.Create(ra, dec, para);
         }
+
+
+        //--------------------------------------------------------------------------
+
+        // determine Julian day from calendar date
+        // (Jean Meeus, "Astronomical Algorithms", Willmann-Bell, 1991)
+        private static double julian_day(DateTimeOffset date)                           // be carefull, the function of the similare name (Julian_Day) is used in astroAWK1.js library
+                                                        // current function uses date in the form of "date object", while that other function uses three arguments of calendar date
+        {
+            double a, b, jd;
+            bool gregorian;
+            var Now = date;
+
+            var month = Now.Month;
+            var day = Now.Day;
+            double year = Now.Year;
+
+            gregorian = (!(year < 1583));
+
+            if ((month == 1) || (month == 2))
+            {
+                year = year - 1;
+                month = month + 12;
+            }
+
+            a = Floor(year / 100);
+            if (gregorian) b = 2 - a + Floor(a / 4);
+            else b = 0.0;
+
+            jd = Floor(365.25 * (year + 4716))
+               + Floor(30.6001 * (month + 1))
+               + day + b - 1524.5;
+
+            return jd;
+        }
+
+        // returns value for sign of argument
+        private static sbyte sgn(double x)
+        {
+            sbyte rv;
+            if (x > 0.0) rv = 1;
+            else if (x < 0.0) rv = -1;
+            else rv = 0;
+            return rv;
+        }
+
+        //private static double[] Sky = {0.0, 0.0, 0.0};
+        //private static double[] RAn = { 0.0, 0.0, 0.0 };
+        //private static double[] Dec = { 0.0, 0.0, 0.0 };
+        //private static double[] VHz = { 0.0, 0.0, 0.0 };
+
+
+
+      
 
 
 
@@ -284,7 +289,7 @@ namespace Twilight.Internal
 
             for (k = 0; k < 3; k++)
             {
-                var ret = moon(jd);
+                var ret = GetMoonPosition(jd);
                 mp[k,0] = ret.Item1;
                 mp[k,1] = ret.Item2;
                 mp[k,2] = ret.Item3;
@@ -356,52 +361,7 @@ namespace Twilight.Internal
 
 
             return new MoonPeriod(moonrise,moonset,moonPeriodType);
-
-            // display results
-            // extensions and changes by AWK
-            //calc.moonrise.value = zintstr(Rise_time[0], 2) + ":" + zintstr(Rise_time[1], 2);
-            //calc.moonset.value = zintstr(Set_time[0], 2) + ":" + zintstr(Set_time[1], 2);
-
-            //var zoneInt = parseFloat(calc.time_zone.value * 1.0);
-            //var dstInt = DSTfact;
-            //var timeDiff = zoneInt + dstInt;
-            //var timeDiffHours = Math.floor(timeDiff);
-            //var timeDiffMinutes = (timeDiff - timeDiffHours) * 60;
-            //dateLocal.setHours(Rise_time[0] + timeDiffHours, Rise_time[1] + timeDiffMinutes, 0);
-            //var DayMonth = " ";
-            //if (Now.getDate() != dateLocal.getDate())
-            //{
-            //    DayMonth = " /" + dateLocal.getDate() + " " + monthList[dateLocal.getMonth()].abbr + "/"
-            //};
-            //if (Moonrise)
-            //{
-            //    calc.moonriseUTC.value = zintstr(dateLocal.getHours(), 2) + ":" + zintstr(dateLocal.getMinutes(), 2) + DayMonth
-            //}
-            //else
-            //{
-            //    calc.moonriseUTC.value = " "
-            //};
-
-            //LunarCyclePhasesData(dateLocal);
-            //MoonriseSec = ElapsedTime(firstNewMoon, dateLocal);
-            //if (Moonrise) { calc.LunPhasRise.value = curMoonPhase(MoonriseSec) } else { calc.LunPhasRise.value = " " };
-
-            //var yNow = Now.getFullYear();
-            //var mNow = Now.getMonth();
-            //var dNow = Now.getDate();
-            //dateLocal.setFullYear(yNow, mNow, dNow);
-            //dateLocal.setHours(Set_time[0] + timeDiffHours, Set_time[1] + timeDiffMinutes, 0);
-            //var DayMonth = " ";
-            //if (Now.getDate() != dateLocal.getDate()) { DayMonth = " /" + dateLocal.getDate() + " " + monthList[dateLocal.getMonth()].abbr + "/" };
-            //if (Moonset) { calc.moonsetUTC.value = zintstr(dateLocal.getHours(), 2) + ":" + zintstr(dateLocal.getMinutes(), 2) + DayMonth } else { calc.moonsetUTC.value = " " };
-            //LunarCyclePhasesData(dateLocal);
-            //MoonsetSec = ElapsedTime(firstNewMoon, dateLocal);
-            //if (Moonset) { calc.LunPhasSet.value = curMoonPhase(MoonsetSec) } else { calc.LunPhasSet.value = " " };
-
-            //if (Moonrise) { calc.azRise.value = frealstr(Rise_az, 5, 1) + "°" } else { calc.azRise.value = " " };
-            //if (Moonset) { calc.azSet.value = frealstr(Set_az, 5, 1) + "°" } else { calc.azSet.value = " " };
-            //// END of extensions and changes by AWK
-            //special_message();
+           
         }
 
 

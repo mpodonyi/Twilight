@@ -67,7 +67,7 @@ namespace Twilight
             ThrowHelper.CheckLat(lat);
             ThrowHelper.CheckLng(lng);
 
-            return MoonHelper2.CalcMoonriseSet(lat, lng, localDate);
+            return MoonHelper.CalcMoonriseSet(lat, lng, localDate);
         }
     }
 }

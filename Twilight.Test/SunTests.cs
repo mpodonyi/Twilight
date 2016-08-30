@@ -23,22 +23,10 @@ namespace Twilight.Test
 
         [InlineData("Alert", "2016-08-09T10:10:10-04:00", "82°31'N", "62°18'W", null, null, SunPeriodTypes.UpAllDay)]
         [InlineData("Alert", "2016-01-09T10:10:10-04:00", "82°31'N", "62°18'W", null, null, SunPeriodTypes.DownAllDay)]
-
-
-      
-
-
-
-        //[InlineData("Alert", "2016-08-09T10:10:10-04:00", "82°31'N", "62°18'W", "2016-04-06T00:00:00-00:00", "2016-09-06T00:00:00-00:00", SunPeriodTypes.UpAllDay)]
-        //[InlineData("Alert", "2016-01-09T10:10:10-04:00", "82°31'N", "62°18'W", "2016-02-28T00:00:00-00:00", "2015-10-15T00:00:00-00:00", SunPeriodTypes.DownAllDay)]
         public void SunRiseSetTest(string city, string dateTimeOffset, string lat, string lng, string sunrise, string sunset, SunPeriodTypes sunPeriodTypes)
         {
             SunTest(dateTimeOffset, lat, lng, sunrise, sunset, sunPeriodTypes, Sun.Period);
         }
-
-
-
-
 
         [Theory]
         [InlineData("London", "2016-08-09T10:10:10+01:00", "51°30'N", "0°08'W", "2016-08-09T04:58:00+01:00", "2016-08-09T21:12:00+01:00", SunPeriodTypes.RiseAndSet)]
@@ -48,7 +36,6 @@ namespace Twilight.Test
         {
             SunTest(dateTimeOffset, lat, lng, sunrise, sunset, sunPeriodTypes, Sun.CivilPeriod);
         }
-
 
         [Theory]
         [InlineData("London", "2016-08-09T10:10:10+01:00", "51°30'N", "0°08'W", "2016-08-09T04:08:00+01:00", "2016-08-09T22:02:00+01:00", SunPeriodTypes.RiseAndSet)]
