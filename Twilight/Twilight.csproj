@@ -43,7 +43,6 @@
     <Compile Include="Internal\MoonHelper2.cs" />
     <Compile Include="Internal\ThrowHelper.cs" />
     <Compile Include="Moon.cs" />
-    <Compile Include="Internal\MoonHelper.cs" />
     <Compile Include="MoonPeriod.cs" />
     <Compile Include="Sun.cs" />
     <Compile Include="Internal\SunHelper.cs" />

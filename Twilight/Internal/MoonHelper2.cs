@@ -22,7 +22,7 @@ namespace Twilight.Internal
             var day = Now.Day;
             double year = Now.Year;
 
-            gregorian = (year < 1583) ? false : true;
+            gregorian = (!(year < 1583));
 
             if ((month == 1) || (month == 2))
             {
